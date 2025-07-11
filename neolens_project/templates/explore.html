@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+
+{% block title %}Explore Cases | NeoLens{% endblock %}
+
+{% block content %}
+
+
+
+
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Explore | NeoLens</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap & Google Fonts -->
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #111827;
+      color: #f1f1f1;
+    }
+
+    .explore-header {
+      padding: 2rem 0 1rem;
+      text-align: center;
+    }
+
+    .explore-header h1 {
+      font-weight: 700;
+    }
+
+    .explore-header p {
+      color: #9ca3af;
+    }
+
+    .btn-outline-secondary {
+      border: 1px solid #6b7280;
+      color: #d1d5db;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-outline-secondary:hover {
+      background-color: #1f2937;
+    }
+
+    .filter-form .form-select,
+    .filter-form .form-control {
+      background-color: #1f2937;
+      border: 1px solid #374151;
+      color: #f1f1f1;
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.05);
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .filter-form .form-select:focus,
+    .filter-form .form-control:focus {
+      border-color: #fbbf24;
+      box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.3);
+      outline: none;
+    }
+
+    .filter-form .form-label {
+      color: #d1d5db;
+      font-weight: 500;
+    }
+
+    .filter-form .btn-warning {
+      background-color: #fbbf24;
+      color: #000;
+      padding: 0.6rem 2rem;
+      font-weight: 600;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(251, 191, 36, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .filter-form .btn-warning:hover {
+      background-color: #fcd34d;
+      box-shadow: 0 6px 14px rgba(251, 191, 36, 0.4);
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.5rem;
+      padding: 1rem 2rem 2rem;
+    }
+
+    .video-card {
+      background-color: #1f2937;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s ease-in-out;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .video-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+    }
+
+    .video-thumbnail {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .video-info {
+      padding: 1rem;
+    }
+
+    .video-info h5 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #fbbf24;
+    }
+
+    .video-info p {
+      font-size: 0.875rem;
+      color: #d1d5db;
+      margin: 0.2rem 0;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem 0;
+      font-size: 0.9rem;
+      background-color: #0f172a;
+      color: #9ca3af;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header class="explore-header">
+    <h1 class="fw-bold text-warning">Explore Jaundice Cases</h1>
+    <p>Browse a selection of training cases below</p>
+    <a href="{% url 'home' %}" class="btn btn-sm btn-outline-secondary mt-2">← Back to Home</a>
+  </header>
+
+  <!-- Filter Form -->
+  <div class="container">
+    <form method="GET" class="row align-items-end g-3 mb-4 filter-form">
+
+      <div class="col-md-3">
+        <label for="ethnicity" class="form-label">Ethnicity</label>
+        <select name="ethnicity" id="ethnicity" class="form-select">
+          <option value="">All Ethnicities</option>
+          <option value="Black" {% if request.GET.ethnicity == "Black" %}selected{% endif %}>Black</option>
+          <option value="Asian" {% if request.GET.ethnicity == "Asian" %}selected{% endif %}>Asian</option>
+          <option value="Mixed" {% if request.GET.ethnicity == "Mixed" %}selected{% endif %}>Mixed</option>
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <label for="region" class="form-label">Affected Region</label>
+        <select name="region" id="region" class="form-select">
+          <option value="">All Regions</option>
+          {% for r in region_list %}
+            <option value="{{ r }}" {% if request.GET.region == r %}selected{% endif %}>{{ r }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <label for="feeding" class="form-label">Feeding Pattern</label>
+        <select name="feeding" id="feeding" class="form-select">
+          <option value="">Any</option>
+          <option value="Normal" {% if request.GET.feeding == "Normal" %}selected{% endif %}>Normal</option>
+          <option value="Poor" {% if request.GET.feeding == "Poor" %}selected{% endif %}>Poor</option>
+          <option value="Frequent" {% if request.GET.feeding == "Frequent" %}selected{% endif %}>Frequent</option>
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <label for="search" class="form-label">Search Notes/Symptoms</label>
+        <input type="text" name="q" id="search" class="form-control" placeholder="e.g., dark urine, sleepy" value="{{ request.GET.q }}">
+      </div>
+
+      <div class="col-12 text-end">
+        <button type="submit" class="btn btn-warning px-4">Apply Filters</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Grid of Cases -->
+  <section class="video-grid">
+    {% for case in cases %}
+    <a href="{% url 'case_detail' case.id %}" class="video-card">
+      <img src="{{ case.image.url }}" alt="Case image" class="video-thumbnail">
+      <div class="video-info">
+        <h5>{{ case.ethnicity }} - {{ case.region|capfirst }}</h5>
+        <p>Condition: {{ case.condition|capfirst }}</p>
+        <p>Feeding: {{ case.feeding_pattern }}</p>
+        <p>Skin: {{ case.skin_color }}</p>
+      </div>
+    </a>
+    {% empty %}
+    <div class="text-center text-muted w-100 py-5">
+      <p>No matching cases found. Try adjusting your filters.</p>
+    </div>
+    {% endfor %}
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    © 2025 NeoLens. All rights reserved.
+  </footer>
+
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>
+
+
+
+{% endblock %}
