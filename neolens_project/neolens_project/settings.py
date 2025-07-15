@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'cases'
+    'cases',
+    'jaundice_screening'
 ]
 
 MIDDLEWARE = [
@@ -129,6 +130,14 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+
+import os
+from django.conf import settings
+import joblib
+
+MODEL_PATH = os.path.join(settings.BASE_DIR, 'jaundice_screening/model/jaundice_xgb_model.pkl')
+model = joblib.load(MODEL_PATH)
 
 
 

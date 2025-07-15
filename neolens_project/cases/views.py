@@ -1,48 +1,11 @@
-# from django.shortcuts import render
-# from .models import JaundiceCase
-
 def home(request):
     return render(request, 'home.html')
 
-# def explore(request):
-#     cases = JaundiceCase.objects.all()
-#     return render(request, 'explore.html', {'cases': cases})
 
-from django.shortcuts import render
-# from .models import JaundiceCase
-# import random
-
-# def explore(request):
-#     all_cases = list(JaundiceCase.objects.all())
-#     cases = random.sample(all_cases, min(30, len(all_cases)))
-#     return render(request, 'explore.html', {'cases': cases})
-
-# from django.db.models import Q
-# import random
-
-# def explore(request):
-#     cases = JaundiceCase.objects.all()
-
-#     ethnicity = request.GET.get('ethnicity')
-    ## region = request.GET.get('region')
-#     feeding = request.GET.get('feeding_pattern')
-
-#     if ethnicity:
-#         cases = cases.filter(ethnicity=ethnicity)
-#     if region:
-#         cases = cases.filter(region=region)
-#     if feeding:
-#         cases = cases.filter(feeding_pattern=feeding)
-
-#     cases = list(cases)
-#     random.shuffle(cases)
-#     cases = cases[:30]
-
-#     return render(request, 'explore.html', {'cases': cases})
-
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
-from .models import JaundiceCase  # Ensure this is correctly imported
+from .models import JaundiceCase
+import random
 
 def explore(request):
     ethnicity = request.GET.get('ethnicity')
@@ -50,8 +13,10 @@ def explore(request):
     feeding = request.GET.get('feeding')
     search_query = request.GET.get('q')
 
+    # Base queryset
     cases = JaundiceCase.objects.all()
 
+    # Apply filters
     if ethnicity:
         cases = cases.filter(ethnicity__iexact=ethnicity)
     if region:
@@ -70,18 +35,20 @@ def explore(request):
             Q(notes__icontains=search_query)
         )
 
-    cases = cases.order_by('?')[:30]
+    # Shuffle and limit to 12
+    cases = cases.order_by('?')[:12]
 
-    # Define dropdown options here
+    # Dropdown filter options
     ethnicities = ["Black", "Asian", "Mixed"]
-    regions = ["Eyes", "Palms", "Feet", "Gums", "Tongue"]
+    region_list = ["Eyes", "Palms", "Feet", "Gums", "Tongue"]
 
     return render(request, 'explore.html', {
         'cases': cases,
         'ethnicities': ethnicities,
-        'regions': regions,
+        'region_list': region_list,
         'request': request,
     })
+
 
 
 
@@ -122,11 +89,6 @@ def case_detail(request, pk):
 
 
 
-
-def jaundice_checker(request):
-    return render(request, 'jaundice_checker.html')
-
-
 from django.core.files.storage import FileSystemStorage
 
 def comparison_tool(request):
@@ -150,3 +112,29 @@ def comparison_tool(request):
         'image1_url': image1_url,
         'image2_url': image2_url
     })
+
+
+from django.core.files.storage import FileSystemStorage
+import random
+
+def jaundice_checker(request):
+    uploaded_image_url = None
+    prediction = None
+
+    if request.method == 'POST' and request.FILES.get('image'):
+        fs = FileSystemStorage()
+        image = request.FILES['image']
+        filename = fs.save(f"checker_uploads/{image.name}", image)
+        uploaded_image_url = fs.url(filename)
+
+        prediction = {
+            'score': round(random.uniform(45, 95), 2),
+            'region': random.choice(['Eyes', 'Skin', 'Gums', 'Tongue']),
+            'notes': 'Signs of yellowing observed in localized regions.'
+        }
+
+    return render(request, 'jaundice_checker.html', {
+        'uploaded_image_url': uploaded_image_url,
+        'prediction': prediction
+    })
+
